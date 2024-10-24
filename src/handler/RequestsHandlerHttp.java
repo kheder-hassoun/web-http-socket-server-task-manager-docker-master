@@ -12,29 +12,47 @@ public class RequestsHandlerHttp implements HttpHandler {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        Headers requestHeaders = httpExchange.getRequestHeaders();
         String response = "";
+        int statusCode = 200;
 
-        String requestMethod = httpExchange.getRequestMethod();
-        switch (requestMethod) {
-            case "GET":
+        try {
+            String requestMethod = httpExchange.getRequestMethod();
+            if ("GET".equalsIgnoreCase(requestMethod)) {
                 response = TasksList.INSTANCE.list();
-                break;
-            case "POST":
-                InputStream input = httpExchange.getRequestBody();
-                StringBuilder params = new StringBuilder();
-                new BufferedReader(new InputStreamReader(input))
-                    .lines()
-                    .forEach(s -> params.append(s));
+            } else if ("POST".equalsIgnoreCase(requestMethod)) {
+                response = handlePostRequest(httpExchange);
+            } else {
+                response = "Unsupported request method: " + requestMethod;
+                statusCode = 405; // Method Not Allowed
+            }
+        } catch (Exception e) {
+            response = "Internal server error: " + e.getMessage();
+            statusCode = 500; // Internal Server Error
+            e.printStackTrace();
+        } finally {
+            sendResponse(httpExchange, response, statusCode);
+        }
+    }
 
-                System.out.println("New request from " + requestHeaders.get("User-agent") + " -> " + params);
-                response = TaskExecutor.INSTANCE.run(params.toString());
-                break;
+    private String handlePostRequest(HttpExchange httpExchange) throws IOException {
+        Headers requestHeaders = httpExchange.getRequestHeaders();
+        StringBuilder params = new StringBuilder();
+
+        // Using try-with-resources to ensure stream is closed automatically
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody()))) {
+            reader.lines().forEach(params::append);
         }
 
-        httpExchange.sendResponseHeaders(200, response.getBytes().length);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
+        System.out.println("New request from " + requestHeaders.getFirst("User-Agent") + " -> " + params);
+        return TaskExecutor.INSTANCE.run(params.toString());
+    }
+
+    private void sendResponse(HttpExchange httpExchange, String response, int statusCode) throws IOException {
+        byte[] responseBytes = response.getBytes();
+        httpExchange.sendResponseHeaders(statusCode, responseBytes.length);
+
+        try (OutputStream os = httpExchange.getResponseBody()) {
+            os.write(responseBytes);
+        }
     }
 }
