@@ -17,6 +17,7 @@ public enum TaskExecutor {
     public String run(String parameters) {
         String taskName, input = "";
 
+
         List<String> list = Arrays.stream(parameters.split("&")).collect(Collectors.toList());
 
         long start = System.currentTimeMillis();
