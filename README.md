@@ -70,5 +70,23 @@ You can use [k6](https://k6.io/) to test the `TaskWriteOnFile` functionality, wh
 
 ---
 
+3. **Run the k6 Stress Test**:
+
+   To run the stress test, open a terminal and navigate to the directory where `stress_test.js` (its in the project folder dirctly). Run the following command:
+
+   ```bash
+   k6 run stress_test.js
+   ```
+
+4. **Run the k6 Spike Test**:
+
+   To run the Spike test, open a terminal and navigate to the directory where `spiky.js` (its in the project folder dirctly). Run the following command:
+
+   ```bash
+   k6 run spiky.js
+   ```
+
+
+
 ![alt text](image_2024-10-25_23-19-32.png)
 ![alt text](image.png)
