@@ -5,11 +5,11 @@ export const options = {
     scenarios: {
         constant_request_rate: {
             executor: 'constant-arrival-rate',
-            rate: 100, // 100 requests total
+            rate: 1000, // 100 requests total
             timeUnit: '1m', // in 1 minute
             duration: '1m', // test duration
-            preAllocatedVUs: 10, // number of virtual users to allocate
-            maxVUs: 20, // max number of virtual users allowed
+            preAllocatedVUs: 10, 
+            maxVUs: 20, 
         },
     },
 };
