@@ -1,6 +1,6 @@
 ### Project Structure
 
-```plaintext
+```css
 web-http-socket-server-task-manager-docker-master/
 ├── .idea/
 ├── out/
